@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+import traceback
+import cgitb
+cgitb.enable()
+
 """
 For your homework this week, you'll be creating a wsgi application of
 your own.
@@ -41,17 +46,91 @@ To submit your homework:
 
 """
 
+def directions(*args):
+    """ Returns a STRING with the sum of the arguments """
+
+    # TODO: Fill sum with the correct value, based on the
+    # args provided.
+
+    body = """
+<h1>Directions for Use</h1>
+<p>http://localhost:8080/multiply/3/5   => 15</p>
+"""
+
+    return body
+
 
 def add(*args):
     """ Returns a STRING with the sum of the arguments """
 
     # TODO: Fill sum with the correct value, based on the
     # args provided.
-    sum = "0"
+    body = """
+<h1>Adding Numbers</h1>
+<p>The sum of your numbers is: {0}</p>
+"""
+    sums = 0
+    if sums is None:
+        raise NameError
 
-    return sum
+    response_body = body.format(sums)
+    return response_body
 
 # TODO: Add functions for handling more arithmetic operations.
+
+
+def subtract(*args):
+    """ Returns a STRING with the difference of the arguments """
+
+    # TODO: Fill sum with the correct value, based on the
+    # args provided.
+    body = """
+<h1>Subtracting Numbers</h1>
+<p>The difference of your numbers is: {0}</p>
+"""
+    diff = 0
+    if diff is None:
+        raise NameError
+
+    response_body = body.format(diff)
+    return response_body
+
+
+def divide(*args):
+    """ Returns a STRING with the quotient of the arguments """
+
+    # TODO: Fill sum with the correct value, based on the
+    # args provided.
+    body = """
+<h1>Dividing Numbers</h1>
+<p>The Quotient of your numbers is: {0}</p>
+"""
+    quotient = 0
+    if quotient is None:
+        raise NameError
+
+    response_body = body.format(quotient)
+    return response_body
+
+
+def multiply(*args):
+    """ Returns a STRING with the product of the arguments """
+
+    # TODO: Fill sum with the correct value, based on the
+    # args provided.
+
+    body = """
+<h1>Multiplying Numbers</h1>
+<p>The Product of your numbers is: {0}</p>
+"""
+    product = 0
+    product = 0
+    if product is None:
+        raise NameError
+
+    response_body = body.format(product)
+    return response_body
+
 
 def resolve_path(path):
     """
@@ -63,10 +142,24 @@ def resolve_path(path):
     # examples provide the correct *syntax*, but you should
     # determine the actual values of func and args using the
     # path.
-    func = add
-    args = ['25', '32']
 
+    funcs = {
+        '': directions,
+        'add': add,
+        'subtract': subtract,
+        'divide': divide,
+        'multiply': multiply}
+    path = path.strip('/').split('/')
+    func_name = path[0]
+    args = path[1:]
+
+    try:
+        func = funcs[func_name]
+
+    except KeyError:
+        raise NameError
     return func, args
+
 
 def application(environ, start_response):
     # TODO: Your application code from the book database
@@ -76,9 +169,28 @@ def application(environ, start_response):
     #
     # TODO (bonus): Add error handling for a user attempting
     # to divide by zero.
-    pass
+    status = "200 OK"
+    headers = [('Content-type', 'text/html')]
+    try:
+        path = environ.get('PATH_INFO', None)
+        if path is None:
+            raise NameError
+        func, args = resolve_path(path)
+        body = func(*args)
+        status = "200 OK"
+    except NameError:
+        status = "404 Not Found"
+        body = "<h1> Not Found </h1>"
+    except Exception:
+        status = "500 Internal Server Error"
+        body = "<h1>Internal Server Error</h1>"
+        print(traceback.format_exc())
+    finally:
+        headers.append(('Content-length', str(len(body))))
+        start_response(status, headers)
+        return [body.encode('utf8')]
 
 if __name__ == '__main__':
-    # TODO: Insert the same boilerplate wsgiref simple
-    # server creation that you used in the book database.
-    pass
+    from wsgiref.simple_server import make_server
+    srv = make_server('localhost', 8080, application)
+    srv.serve_forever()
