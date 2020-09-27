@@ -55,6 +55,10 @@ def directions(*args):
     body = """
 <h1>Directions for Use</h1>
 <p>http://localhost:8080/multiply/3/5   => 15</p>
+<p>  http://localhost:8080/add/23/42      => 65</p>
+<p> http://localhost:8080/subtract/23/42 => -19</p>
+<p>http://localhost:8080/divide/22/11   => 2</p>
+<p>http://localhost:8080/   =>Here's how to use this page...</p>
 """
 
     return body
@@ -66,31 +70,38 @@ def add(*args):
     # TODO: Fill sum with the correct value, based on the
     # args provided.
     body = """
-<h1>Adding Numbers</h1>
+<h1>Adding Successful</h1>
 <p>The sum of your numbers is: {0}</p>
 """
     sums = 0
-    if sums is None:
-        raise NameError
+    if len(args) < 2:
+        response_body = """<h1>You Need More Numbers</h1>"""
+        return response_body
+    for arg in args:
+        sums += int(arg)
 
     response_body = body.format(sums)
     return response_body
 
-# TODO: Add functions for handling more arithmetic operations.
 
 
 def subtract(*args):
     """ Returns a STRING with the difference of the arguments """
 
-    # TODO: Fill sum with the correct value, based on the
-    # args provided.
+
     body = """
-<h1>Subtracting Numbers</h1>
+<h1>Subtracting Successful</h1>
 <p>The difference of your numbers is: {0}</p>
 """
-    diff = 0
-    if diff is None:
-        raise NameError
+    if len(args) < 2:
+        response_body = """<h1>You Need More Numbers</h1>"""
+        return response_body
+
+    diff = int(args[0])
+    rest_num = args[1:]
+
+    for number in rest_num:
+        diff = diff-int(number)
 
     response_body = body.format(diff)
     return response_body
@@ -102,12 +113,21 @@ def divide(*args):
     # TODO: Fill sum with the correct value, based on the
     # args provided.
     body = """
-<h1>Dividing Numbers</h1>
+<h1>Dividing Successful</h1>
 <p>The Quotient of your numbers is: {0}</p>
 """
-    quotient = 0
-    if quotient is None:
-        raise NameError
+    if len(args) < 2:
+        response_body = """<h1>You Need More Numbers</h1>"""
+        return response_body
+
+    dividend = int(args[0])
+    rest_num = args[1]
+
+    try:
+        quotient = dividend/int(rest_num)
+    except ZeroDivisionError:
+        response_body = """<h1>You Can't Divide By Zero</h1>"""
+        return response_body
 
     response_body = body.format(quotient)
     return response_body
@@ -120,13 +140,18 @@ def multiply(*args):
     # args provided.
 
     body = """
-<h1>Multiplying Numbers</h1>
+<h1>Multiplying Successful</h1>
 <p>The Product of your numbers is: {0}</p>
 """
-    product = 0
-    product = 0
-    if product is None:
-        raise NameError
+    if len(args) < 2:
+        response_body = """<h1>You Need More Numbers</h1>"""
+        return response_body
+
+    product = int(args[0])
+    rest_num = args[1:]
+
+    for number in rest_num:
+        product = product*int(number)
 
     response_body = body.format(product)
     return response_body
